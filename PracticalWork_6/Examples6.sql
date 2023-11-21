@@ -1,17 +1,13 @@
 --1 Ќайти долю затрат каждого покупател€ на каждый купленный им продукт среди общих его затрат в данной сети магазинов. 
 --ћожно использовать обобщенное табличное выражение.
-SELECT [SalesORDERID], p.[ProductID],
-[ProductSubcategoryID],
-[ORDERQty]*[UnitPrice],
-[ORDERQty]*[UnitPrice]/sum([ORDERQty]*[UnitPrice])
-OVER(partitiON BY [SalesORDERID]
-, [ProductSubcategoryID])
+SELECT [SalesORDERID], p.[ProductID], [ProductSubcategoryID], [ORDERQty]*[UnitPrice] AS FULL_PRICE,
+[ORDERQty]*[UnitPrice]/sum([ORDERQty]*[UnitPrice]) OVER(partitiON BY [SalesORDERID], [ProductSubcategoryID]) AS dolia
 FROM [Sales].[SalesORDERDetail] AS SOD INner JOIN
 [Production].[Product] AS p
 ON SOD.ProductID=p.ProductID
 
 --2 ƒл€ одного выбранного покупател€ вывести, дл€ каждой покупки (чека), разницу в деньгах между этой и следующей покупкой.
---¬ариант 1
+--¬ариант 1 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 with tmp (customer, ORDERid, total) AS
 (SELECT soh.CustomerID, soh.SalesORDERID,
 sum(sod.[ORDERQty]*[UnitPrice]) AS total
@@ -39,6 +35,5 @@ GROUP BY oh.CustomerID, od.SalesORDERID)
 SELECT
 cus, ord, ORDERsum,
 sum(ORDERsum)
-OVER(partitiON BY cus ORDER BY ord desc
-RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)
+OVER(partitiON BY cus ORDER BY ord desc RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)
 FROM tmp;
